@@ -214,7 +214,7 @@ function Build-Image {
 }
 
 # Function to deploy to Kubernetes
-function Deploy-Kubernetes {
+function Start-KubernetesDeployment {
     param($ClusterInfo)
     
     Write-Status "Deploying to Kubernetes..."
@@ -310,7 +310,7 @@ function Main {
     Set-KubectlConfig -ClusterInfo $ClusterInfo
     Test-GMPStatus -ClusterInfo $ClusterInfo
     Build-Image -ClusterInfo $ClusterInfo
-    Deploy-Kubernetes -ClusterInfo $ClusterInfo
+    Start-KubernetesDeployment -ClusterInfo $ClusterInfo
     Wait-Deployment
     Show-AccessInfo
     Start-LoadTest

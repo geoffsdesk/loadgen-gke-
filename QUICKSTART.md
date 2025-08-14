@@ -14,7 +14,7 @@ Get your GKE Load Generator up and running in minutes!
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/loadgen-gke.git
+git clone https://github.com/geoffsdesk/loadgen-gke.git
 cd loadgen-gke
 
 # Make scripts executable
@@ -108,6 +108,6 @@ curl http://localhost:8000/metrics
 
 ## Support
 
-- GitHub Issues: [Create an issue](https://github.com/yourusername/loadgen-gke/issues)
+- GitHub Issues: [Create an issue](https://github.com/geoffsdesk/loadgen-gke/issues)
 - Documentation: [Full README](README.md)
 - Examples: [Workload Profiles](examples/workload-profiles.yaml)

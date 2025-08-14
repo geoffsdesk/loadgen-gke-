@@ -31,7 +31,7 @@ A comprehensive load generation tool for Google Kubernetes Engine (GKE) workload
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/loadgen-gke.git
+   git clone https://github.com/geoffsdesk/loadgen-gke.git
    cd loadgen-gke
    ```
 
@@ -116,5 +116,5 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-- GitHub Issues: [Create an issue](https://github.com/yourusername/loadgen-gke/issues)
-- Documentation: [Wiki](https://github.com/yourusername/loadgen-gke/wiki)
+- GitHub Issues: [Create an issue](https://github.com/geoffsdesk/loadgen-gke/issues)
+- Documentation: [Wiki](https://github.com/geoffsdesk/loadgen-gke/wiki)
