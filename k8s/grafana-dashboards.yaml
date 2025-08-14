@@ -1,0 +1,258 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  dashboard-provider.yaml: |
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        path: /etc/grafana/provisioning/dashboards
+        
+  loadgen-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Load Generator Overview",
+        "tags": ["loadgen", "gke"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Load Generation Requests",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(rate(loadgen_requests_total[5m])) by (workload_type)",
+                "legendFormat": "{{workload_type}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "displayMode": "list"
+                }
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Resource Usage",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "loadgen_resource_usage{resource_type=~\"cpu_percent|memory_percent\"}",
+                "legendFormat": "{{resource_type}} - {{workload_type}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          },
+          {
+            "id": 3,
+            "title": "Error Rate",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(rate(loadgen_errors_total[5m])) by (workload_type)",
+                "legendFormat": "{{workload_type}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "10s"
+      }
+    }
+    
+  k8s-control-plane.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Kubernetes Control Plane",
+        "tags": ["kubernetes", "control-plane", "gke"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "API Server Request Rate",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(rate(apiserver_request_total[5m])) by (resource, verb)",
+                "legendFormat": "{{resource}} - {{verb}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Scheduler Performance",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "scheduler_scheduling_algorithm_duration_seconds",
+                "legendFormat": "{{algorithm}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          },
+          {
+            "id": 3,
+            "title": "Controller Manager",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "workqueue_depth",
+                "legendFormat": "{{name}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "10s"
+      }
+    }
+    
+  cluster-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cluster Overview",
+        "tags": ["kubernetes", "cluster", "gke"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Node CPU Usage",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Node Memory Usage",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "100 - ((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100)",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "drawStyle": "line",
+                  "lineInterpolation": "linear"
+                }
+              }
+            }
+          },
+          {
+            "id": 3,
+            "title": "Pod Count by Namespace",
+            "type": "piechart",
+            "targets": [
+              {
+                "expr": "count(kube_pod_info) by (namespace)",
+                "legendFormat": "{{namespace}}"
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "10s"
+      }
+    }

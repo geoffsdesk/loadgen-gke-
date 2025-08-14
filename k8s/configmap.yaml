@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loadgen-config
+  namespace: loadgen
+data:
+  # Default workload configuration
+  workload-type: "mixed"
+  load-intensity: "medium"
+  duration: "300"
+  burst-pattern: "false"
+  
+  # CPU workload specific settings
+  cpu-threads: "4"
+  cpu-calculation-iterations: "1000000"
+  
+  # Memory workload specific settings
+  memory-chunk-size-mb: "250"
+  memory-allocations: "10"
+  
+  # Network workload specific settings
+  network-endpoints: |
+    https://httpbin.org/get
+    https://httpbin.org/post
+    https://httpbin.org/status/200
+    https://httpbin.org/delay/1
+  network-concurrent-requests: "3"
+  
+  # Storage workload specific settings
+  storage-file-size-mb: "1"
+  storage-max-files: "10"
+  
+  # Monitoring configuration
+  metrics-port: "8000"
+  log-level: "INFO"

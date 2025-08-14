@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: loadgen
+  labels:
+    app: loadgen
+    component: workload-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgen
+  template:
+    metadata:
+      labels:
+        app: loadgen
+        component: workload-generator
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: loadgen
+        image: loadgen:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: metrics
+        env:
+        - name: WORKLOAD_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: loadgen-config
+              key: workload-type
+        - name: LOAD_INTENSITY
+          valueFrom:
+            configMapKeyRef:
+              name: loadgen-config
+              key: load-intensity
+        - name: DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: loadgen-config
+              key: duration
+        - name: METRICS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: loadgen-config
+              key: metrics-port
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: loadgen-config
+              key: log-level
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgen-service
+  namespace: loadgen
+  labels:
+    app: loadgen
+    component: workload-generator
+spec:
+  selector:
+    app: loadgen
+  ports:
+  - name: metrics
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP

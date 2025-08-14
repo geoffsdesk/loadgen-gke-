@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - name: Google Managed Prometheus
+      type: prometheus
+      access: proxy
+      url: https://managedprometheus.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/prometheus
+      jsonData:
+        httpMethod: POST
+        manageAlerts: false
+        prometheusType: Mimir
+        prometheusVersion: 2.40.0
+        prometheusUrl: https://managedprometheus.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/prometheus
+        httpHeaders:
+          Authorization: Bearer ${GCP_TOKEN}
+      secureJsonData:
+        httpHeaderValue1: ${GCP_TOKEN}
+      
+    - name: Load Generator Metrics
+      type: prometheus
+      access: proxy
+      url: http://loadgen-service.loadgen.svc.cluster.local:8000
+      jsonData:
+        httpMethod: GET
+        manageAlerts: false
+        prometheusType: Prometheus
+        prometheusVersion: 2.40.0
+        
+    - name: K8s Control Plane Metrics
+      type: prometheus
+      access: proxy
+      url: https://kubernetes.default.svc/metrics
+      jsonData:
+        httpMethod: GET
+        manageAlerts: false
+        prometheusType: Prometheus
+        prometheusVersion: 2.40.0
+        tlsSkipVerify: true
+      secureJsonData:
+        httpHeaderValue1: ${K8S_TOKEN}
+        
+    - name: Node Metrics
+      type: prometheus
+      access: proxy
+      url: https://kubernetes.default.svc/api/v1/nodes/metrics
+      jsonData:
+        httpMethod: GET
+        manageAlerts: false
+        prometheusType: Prometheus
+        prometheusVersion: 2.40.0
+        tlsSkipVerify: true
+      secureJsonData:
+        httpHeaderValue1: ${K8S_TOKEN}
